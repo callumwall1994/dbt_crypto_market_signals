@@ -1,0 +1,1 @@
+This repo tracks the top 100 coins by MC and provides potential entry points, long or short
