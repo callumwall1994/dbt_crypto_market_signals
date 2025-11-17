@@ -2,10 +2,13 @@ import requests
 from databricks import sql
 from dotenv import load_dotenv
 import os
+from datetime import datetime, timezone
+import json
 
 #Load local variables
 load_dotenv()
 
+#CoinGecko API
 CG_API_KEY= os.getenv("CG_API_KEY")
 
 url="https://api.coingecko.com/api/v3/coins/markets"
@@ -35,36 +38,25 @@ cursor= connection.cursor()
 
 #Create Table
 cursor.execute("""
-    CREATE TABLE IF NOT EXISTS crypto_raw (
-               id STRING,
-               name STRING,
-               current_price DOUBLE,
-               market_cap DOUBLE,
-               market_cap_rank INT,
-               total_volume DOUBLE,
-               high_24h DOUBLE,
-               low_24h DOUBLE,
-               last_updated TIMESTAMP
+    CREATE TABLE IF NOT EXISTS crypto_bronze_raw (
+               raw_data STRING,
+               created_at TIMESTAMP
+               
 )        
 """)
 
-#Insert rows
-for item in data:
+#Insert rows with data
+created_at_timezone= datetime.now(timezone.utc)
+created_at= created_at_timezone.strftime('%Y-%m-%dT%H:%M:%S.%f')
+
+for coin in data:
+    raw_json=json.dumps(coin)
+
     cursor.execute("""
-        INSERT INTO crypto_raw (id, name, current_price, market_cap, market_cap_rank, total_volume, high_24h, low_24h, last_updated)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, (
-        item["id"],
-        item["name"],
-        item["current_price"],
-        item["market_cap"],
-        item["market_cap_rank"],
-        item["total_volume"],
-        item["high_24h"],
-        item["low_24h"],
-        item["last_updated"]
-    ))
+        INSERT INTO crypto_bronze_raw (raw_data, created_at)
+        VALUES (?, ?)
+    """, (raw_json, created_at))
     
 connection.close()
 
-print("Success!")
+print(f"Top coins added in as of {datetime.now()}")
