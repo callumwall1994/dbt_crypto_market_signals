@@ -1,0 +1,35 @@
+name: 4hourly Crypto Market Signals
+
+on:
+  schedule:
+  - cron: '0 */4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Setup python3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run ingestion script
+      env:
+        CG_API_KEY: ${{ secrets.CG_API_KEY }}
+        SERVER_HOSTNAME: ${{ secrets.SERVER_HOSTNAME }}
+        HTTP_PATH: ${{ secrets.HTTP_PATH }}
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      run: python3 scripts/ingest_coins.py

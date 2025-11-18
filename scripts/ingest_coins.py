@@ -6,7 +6,8 @@ from datetime import datetime, timezone
 import json
 
 #Load local variables
-load_dotenv()
+if not os.getenv("CG_API_KEY"):
+    load_dotenv()
 
 #CoinGecko API
 CG_API_KEY= os.getenv("CG_API_KEY")
@@ -17,7 +18,7 @@ params={
     "price_change_percentage":"1h",
     "include_tokens":"top",
     "order":"market_cap_desc",
-    "per_page":"3"
+    "per_page":"10"
 }
 
 header= {"x-cg-demo-api-key": CG_API_KEY}
