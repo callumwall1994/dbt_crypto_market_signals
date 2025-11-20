@@ -18,7 +18,7 @@ params={
     "price_change_percentage":"1h",
     "include_tokens":"top",
     "order":"market_cap_desc",
-    "per_page":"10"
+    "per_page":"100"
 }
 
 header= {"x-cg-demo-api-key": CG_API_KEY}
